@@ -8,14 +8,14 @@ Die bisherige Adresse [flyleaf1502.github.io/hive/](https://flyleaf1502.github.i
 
 - Teilnehmer melden sich über Discord an. Pro Konto gibt es genau eine Rückmeldung; nach erneutem Login werden die eigenen Angaben zum Bearbeiten geladen. Es gibt keine persönlichen Bearbeitungslinks mehr.
 - Der Discordname stammt serverseitig aus der verifizierten Discord-Identität. Er wird nicht in einem Formular eingegeben und bleibt ausschließlich in der eigenen Rückmeldung und Admin-Ansicht sichtbar.
-- Öffentlich gibt `hive_public_roster` genau **Name, Race, Class, Spec und Rolle** zurück. Die vollständige Tabelle bleibt durch RLS nur für freigeschaltete Admins zugänglich.
+- Öffentlich gibt `hive_public_roster` genau **Name, Race, Class, Spec, Rolle und bevorzugten Server (PVE/PVP)** zurück. Die vollständige Tabelle bleibt durch RLS nur für freigeschaltete Admins zugänglich.
 - Der Admin-Login bleibt separat unter `#/admin`, mit E-Mail/Passwort und Freischaltung über `hive_admins`. Ein normales Discord-Konto erhält keine Admin-Rechte.
 - Teilnehmer lesen, speichern und löschen ausschließlich über die drei `hive_*_my_registration`-RPCs. Diese bestimmen den Eigentümer aus `auth.uid()`, prüfen eine Discord-Identität und ignorieren vom Client mitgesendete Eigentümer oder Discordnamen. Die früheren Token-RPCs sind für `anon` und `authenticated` gesperrt.
 - Supabase speichert die OAuth-E-Mail im Auth-Dienst; die Raid-Tabelle enthält keine E-Mail. Sitzungen liegen im Session Storage des jeweiligen Tabs. OAuth verwendet PKCE; Client-Secret und Service-Role-Key gehören niemals in `dist/` oder Git.
 
 ## Einrichtung
 
-1. Für eine neue Datenbank `db/supabase.sql` ausführen. Für das laufende Projekt ausschließlich gezielte Migrationen unter `db/migrations` verwenden; zuletzt `2026-09-14-discord-accounts.sql`.
+1. Für eine neue Datenbank `db/supabase.sql` ausführen. Für das laufende Projekt ausschließlich gezielte Migrationen unter `db/migrations` verwenden; zuletzt `2026-09-14-server-mode.sql`.
 2. In Supabase Authentication einen Admin mit E-Mail/Passwort anlegen und seine UUID in `public.hive_admins(user_id)` eintragen.
 3. `dist/config.js` enthält nur die öffentliche Supabase-URL und den Publishable Key.
 4. Discord-App **HIVE FOREVER**, Client-ID `1549126667295785110`: OAuth2-Redirect `https://amsmtoxjkitcwzumwyuz.supabase.co/auth/v1/callback`. Das Client-Secret direkt im Supabase-Discord-Anbieter speichern. [Konfiguration und Prüfungen](docs/discord-login.md).
@@ -40,3 +40,7 @@ Maximal vier Raidtage pro Woche, Startzeiten `18:30`, `19:00`, `19:30`, `20:00`,
 Klassen, Spezialisierungen und Rollen nutzen unveränderte Spiel-Icons von [Blizzards offiziellen Klassenseiten](https://worldofwarcraft.blizzard.com/en-us/game/classes) und dem `render.worldofwarcraft.com`-CDN. Die vier klassischen Horde-Rassen zeigen unveränderte Charakterbilder von [Blizzards offizieller Rassenseite](https://worldofwarcraft.blizzard.com/en-us/game/races). Die vom Betreiber bereitgestellte Vorlage `wow-forever-background.png` enthält bereits das WoW-Forever-Logo. Aktiv ist die mit dem eingebauten Imagegen-Tool überarbeitete Fassung `wow-forever-background-hd.png` (1672 × 941 Pixel); Konturen und Schrift sind klarer, feine Bilddetails wurden dabei neu ausgearbeitet. [Prompt und Herkunft](docs/hero-image-notes.md) sind dokumentiert. Die bisherige Titelillustration `forever-hero-art.png` wird als abgedunkelter Hintergrund der Anmelde- und Raid-Überschrift verwendet; sie trägt eine Horley-Signatur. Diese Bilder und World of Warcraft sind © Blizzard Entertainment. Die [Blizzard Legal FAQ](https://www.blizzard.com/en-us/legal/10390250-087d-41fd-aa47-1a44cbacb10b/legal-faq) beschreibt eine widerrufliche, beschränkte Nutzung von Blizzard-Inhalten für private, nicht-kommerzielle Fan-Webseiten. Für eine kommerzielle oder anderweitige Veröffentlichung ist eine eigene Rechteprüfung nötig.
 
 „Noch nicht sicher“ zeigt ein unverändertes WoW-Fragezeichen. Der Skyborne-Platzhalter verwendet [„Elf ear“ von Delapouite](https://game-icons.net/1x1/delapouite/elf-ear.html) ([CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)); das Motiv wurde für HIVE farbig angepasst. Ein veröffentlichter Skyborne-Charaktereditor-Icon steht bislang nicht zur Verfügung. Wowhead- oder Warcraft-Wiki-Dateien werden nicht mitgeliefert.
+
+## Bevorzugter Server
+
+Die Anmeldung fragt PVE oder PVP ab und lädt die Auswahl beim Bearbeiten wieder. Sie ist auch öffentlich als kleines Badge sichtbar. Ältere Rückmeldungen ohne Auswahl zeigen „Noch offen“; ihnen wird keine Präferenz zugeordnet. Alte Clients ohne dieses Feld behalten beim Speichern eine bereits gesetzte Auswahl. Andere Werte werden serverseitig abgewiesen. `tests/server-mode.sql` prüft die Speicherung, Aktualisierung, Admin-Zugriffe und die sechs ausdrücklich öffentlichen Felder mit anschließendem Rollback.
