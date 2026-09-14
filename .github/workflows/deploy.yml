@@ -27,7 +27,7 @@ jobs:
           node --check dist/app.js
           node --check dist/config.js
           node --check dist/vendor/supabase-auth.js
-          node --test tests/race-classes.test.mjs
+          node --test tests/*.test.mjs
           node scripts/build-pages.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

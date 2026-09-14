@@ -12,14 +12,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
-    <script type="module" src="./app.js"></script>
+    <link rel="stylesheet" href="./releases/04e1187afdb32b54/styles.css" />
+    <script type="module" src="./releases/04e1187afdb32b54/app.js"></script>
   </head>
   <body>
     <div class="site-shell">
       <header class="site-header">
         <a class="brand" href="#/willkommen" aria-label="HIVE Startseite">
-          <img class="guild-logo header-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" />
+          <span class="brand-mark">H<span></span></span>
+          <span class="brand-word">HIVE <small>GUILD</small></span>
         </a>
         <nav class="main-nav" aria-label="Hauptnavigation">
           <a href="#/willkommen" data-nav="welcome">Willkommen</a>
@@ -55,7 +56,7 @@
               <p>Von Leysah/Christian, der sich lang genug ausgeruht hat und wieder Bock hat, etwas zu organisieren.</p>
             </div>
             <div class="letter-card">
-              <div class="letter-stamp"><img class="guild-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /></div>
+              <div class="letter-stamp">HIVE<br /><span>GUILD</span></div>
               <p>Ja, ich lebe noch! Seit dem WoW-Forever-Announcement haben sich einige aus unserem alten HIVE-Raid bei mir gemeldet. Deshalb wollte ich mal abchecken, wer bei einem Comeback als Raidgilde dabei wäre.</p>
               <p>Wir hätten richtig Lust, die alten Zeiten wiederaufleben zu lassen: HIVE zurückbringen, vernünftig raiden und hoffentlich auch ab und zu wieder ein RL-Treffen hinbekommen. So nach dem Motto: Die alten Herren gehen noch eine Runde – und zwar auf einem vernünftigen Level. Ich habe auf jeden Fall Bock. Die Pause war lang genug, und dieser Release klingt nach dem spannendsten WoW-Moment seit Jahren.</p>
               <p>Erst mal geht es darum, die groben Dinge abzustecken: Wer aus der alten Runde wäre dabei? Wie viele Raidtage passen? Wie könnte unser Setup aussehen, und welche Ziele haben wir?</p>
@@ -72,14 +73,14 @@
         <section id="signup-view" class="view signup-view" hidden aria-labelledby="signup-title">
           <div class="page-intro"><span class="section-index">02 / ANMELDUNG</span><h1 id="signup-title">HIVE <em>FOREVER?</em></h1><p>Kein Bewerbungsroman. Nur ein paar Infos, damit wir die Planung starten können.</p></div>
           <div id="discord-account" class="discord-account registration-card">
-            <h2>DEIN DISCORD. DEINE ANMELDUNG.</h2>
+            <h2 id="discord-heading">DISCORD ANMELDUNG</h2>
             <p id="discord-status" role="status">Anmeldung wird geprüft …</p>
             <button id="discord-login" class="button button-discord" type="button" disabled><img src="./assets/discord.svg" alt="" />Mit Discord anmelden</button>
-            <button id="discord-logout" class="text-button" type="button" hidden>Discord abmelden</button>
+            <button id="discord-logout" class="button button-discord" type="button" hidden><img src="./assets/discord.svg" alt="" />Discord abmelden</button>
             <div id="discord-error" class="message message-error" role="alert" hidden></div>
           </div>
           <div class="form-layout" hidden>
-            <div class="form-aside"><div class="aside-logo"><img class="guild-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /></div><p class="aside-label">NICE TO KNOW</p><h2>Ihr könnt eure Angaben<br />später updaten.</h2><p>Da manche wahrscheinlich schon während der Beta 5x rerollen werden: Meldet euch einfach wieder mit eurem Discord-Konto an und updatet eure Angaben entsprechend. Einen extra Bearbeitungslink braucht ihr nicht. Das hilft uns bei der Planung – vor allem, wenn es später ums öffentliche Recruiting geht.</p></div>
+            <div class="form-aside"><div class="aside-logo"><img src="./assets/hive-logo.jpg" alt="" /></div><p class="aside-label">NICE TO KNOW</p><h2>Ihr könnt eure Angaben<br />später updaten.</h2><p>Da manche wahrscheinlich schon während der Beta 5x rerollen werden: Meldet euch einfach wieder mit eurem Discord-Konto an und updatet eure Angaben entsprechend. Einen extra Bearbeitungslink braucht ihr nicht. Das hilft uns bei der Planung – vor allem, wenn es später ums öffentliche Recruiting geht.</p></div>
             <form id="registration-form" class="registration-card" novalidate>
               <div class="form-head"><div><span class="form-kicker" id="form-mode-label">ANMELDUNG</span><h2 id="form-heading">DEIN (HIVE)-COMEBACK</h2></div><span class="form-head-icon">✦</span></div>
               <div class="form-section"><div class="form-section-title"><span>01</span><h3>Du &amp; dein Char</h3></div><div class="field-grid">
@@ -132,7 +133,7 @@
 
         <section id="admin-view" class="view dashboard-view" hidden aria-labelledby="dashboard-title">
           <div class="page-intro"><span class="section-index">04 / RAIDLEITUNG</span><h1 id="dashboard-title">DIE <em>PLANUNG.</em></h1><p>Alle Antworten, Zeiten und Kontaktdaten für die Raidleitung.</p></div>
-          <div id="admin-login-card" class="login-layout"><div class="login-art"><img class="guild-logo login-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /><span>RAIDLEITUNG<br />ACCESS ONLY</span></div><form id="admin-login-form" class="login-card"><span class="form-kicker">ADMIN-BEREICH</span><h2>Einloggen</h2><p>Die vollständige Übersicht ist nur für die Raidleitung sichtbar.</p><label class="field"><span>E-Mail</span><input type="email" name="email" autocomplete="username" required placeholder="raidleitung@…" /></label><label class="field"><span>Passwort</span><input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" /></label><div id="login-error" class="message message-error" role="alert" hidden></div><button class="button button-primary" type="submit">Übersicht öffnen <span aria-hidden="true">↗</span></button></form></div>
+          <div id="admin-login-card" class="login-layout"><div class="login-art"><div class="login-symbol">H</div><span>RAIDLEITUNG<br />ACCESS ONLY</span></div><form id="admin-login-form" class="login-card"><span class="form-kicker">ADMIN-BEREICH</span><h2>Einloggen</h2><p>Die vollständige Übersicht ist nur für die Raidleitung sichtbar.</p><label class="field"><span>E-Mail</span><input type="email" name="email" autocomplete="username" required placeholder="raidleitung@…" /></label><label class="field"><span>Passwort</span><input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" /></label><div id="login-error" class="message message-error" role="alert" hidden></div><button class="button button-primary" type="submit">Übersicht öffnen <span aria-hidden="true">↗</span></button></form></div>
           <div id="admin-panel" class="admin-panel" hidden>
             <div class="admin-toolbar"><div><span class="admin-live"><span class="signal-dot"></span> RAID-KADER</span><h2>RÜCKMELDUNGEN</h2></div><button id="logout-button" class="text-button" type="button">Abmelden ↗</button></div>
             <div id="stats-grid" class="stats-grid" aria-live="polite"></div>
@@ -149,7 +150,7 @@
       </dialog>
 
       <footer class="site-footer">
-        <div class="footer-brand"><img class="guild-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /></div>
+        <div class="footer-brand">HIVE <span>GUILD</span></div>
         <a href="https://discord.gg/HcqwdfamRW" target="_blank" rel="noopener noreferrer">Discord ↗</a>
         <span>© HIVE GUILD</span>
         <details class="icon-credits"><summary>Bild-Credits</summary><div>Klassen-, Spec-, Rollen- und Rassenbilder: © Blizzard Entertainment; Originale von <a href="https://worldofwarcraft.blizzard.com/en-us/game/classes" target="_blank" rel="noopener noreferrer">World of Warcraft</a>. WoW-Forever-Hintergrund vom Betreiber bereitgestellt; mit KI zur besseren Lesbarkeit überarbeitet. Skyborne-Platzhalter: <a href="https://game-icons.net/1x1/delapouite/elf-ear.html" target="_blank" rel="noopener noreferrer">„Elf ear“ von Delapouite</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, für HIVE farbig angepasst.</div></details>

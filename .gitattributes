@@ -1,0 +1,4 @@
+# Generated SDK strings contain intentional whitespace; do not rewrite their contents.
+dist/vendor/*.js -whitespace
+dist/releases/*/vendor/*.js -whitespace
+dist/releases/** linguist-generated=true
