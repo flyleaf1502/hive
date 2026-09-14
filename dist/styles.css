@@ -121,10 +121,10 @@ body::before{display:none}
 
 /* Keep the WoW Forever emblem in the supplied artwork unobstructed. */
 .welcome-view::before{display:none}
-.hero-grid{min-height:clamp(660px,50vw,840px);grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);background:linear-gradient(90deg,rgba(8,13,19,.94),rgba(8,13,19,.84) 31%,rgba(8,13,19,.44) 49%,rgba(8,13,19,.05) 66%),linear-gradient(0deg,rgba(10,14,20,.66),transparent 28%),url("assets/wow-forever-background.png") center center/cover no-repeat}
+.hero-grid{min-height:clamp(660px,50vw,840px);grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);background:linear-gradient(90deg,rgba(8,13,19,.94),rgba(8,13,19,.84) 31%,rgba(8,13,19,.44) 49%,rgba(8,13,19,.05) 66%),linear-gradient(0deg,rgba(10,14,20,.66),transparent 28%),url("assets/wow-forever-background-hd.png") center center/cover no-repeat}
 .hero-copy{padding:72px 0 64px}
 .hero-copy h1{font-size:clamp(72px,7vw,116px)}
 .hero-copy .overline{margin-top:32px}
 .hero-lead{max-width:490px;font-size:17px;color:#e1e3e7}
 
-@media(max-width:1050px){.hero-grid{min-height:0;grid-template-columns:1fr;background:linear-gradient(0deg,#0d1219,transparent 22%) center top/100% 56.3vw no-repeat,url("assets/wow-forever-background.png") center top/100% auto no-repeat,#0d1219}.hero-copy{padding:calc(56.3vw + 16px) 0 46px}.hero-copy h1{font-size:clamp(64px,12vw,94px)}.hero-copy .overline{margin-top:28px}.hero-lead{max-width:580px;font-size:16px}}
+@media(max-width:1050px){.hero-grid{min-height:0;grid-template-columns:1fr;background:linear-gradient(0deg,#0d1219,transparent 22%) center top/100% 56.3vw no-repeat,url("assets/wow-forever-background-hd.png") center top/100% auto no-repeat,#0d1219}.hero-copy{padding:calc(56.3vw + 16px) 0 46px}.hero-copy h1{font-size:clamp(64px,12vw,94px)}.hero-copy .overline{margin-top:28px}.hero-lead{max-width:580px;font-size:16px}}
