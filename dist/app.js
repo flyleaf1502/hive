@@ -445,7 +445,7 @@ function renderAdminInsights() {
   const times = $("#time-chart");
   times.replaceChildren();
   for (const [heading, key, options] of [
-    ["Frühester Start", "earliest_start", [...(state.entries.some((entry) => entry.earliest_start === "18:00") ? ["18:00"] : []), "18:30", "19:00", "19:30", "20:00"]],
+    ["Frühester Start", "earliest_start", ["18:30", "19:00", "19:30", "20:00"]],
     ["Spätestes Ende", "latest_end", ["22:00", "22:30", "23:00"]],
   ]) {
     const group = element("div", "time-group");
