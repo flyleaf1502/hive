@@ -41,6 +41,8 @@ Klassen, Spezialisierungen und Rollen nutzen unveränderte Spiel-Icons von [Bliz
 
 „Noch nicht sicher“ zeigt ein unverändertes WoW-Fragezeichen. Der Skyborne-Platzhalter verwendet [„Elf ear“ von Delapouite](https://game-icons.net/1x1/delapouite/elf-ear.html) ([CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)); das Motiv wurde für HIVE farbig angepasst. Ein veröffentlichter Skyborne-Charaktereditor-Icon steht bislang nicht zur Verfügung. Wowhead- oder Warcraft-Wiki-Dateien werden nicht mitgeliefert.
 
+Das statische HELLO-Emoji zeigt den Clown-Pepe beim Dab. Es stammt aus [„Honk Dab“ auf Tenor](https://tenor.com/view/honk-dab-pepe-the-frog-gif-14732365); [Quelle und Aufbereitung](docs/hello-emote.md) sind dokumentiert.
+
 ## Bevorzugter Server
 
 Die Anmeldung fragt PVE, PVP oder „Mir egal“ ab und lädt die Auswahl beim Bearbeiten wieder. Sie ist auch öffentlich als kleines Badge sichtbar. „Mir egal“ wird als `ANY` gespeichert; die Auswahl verwendet drei zusammengehörige, mit dem eingebauten Imagegen-Tool erzeugte Fantasy-Icons: Dungeonportal, gekreuzte Schwerter und Kompass. [Dateien und vollständige Prompts](docs/server-icons.md) sind dokumentiert. Ältere Rückmeldungen ohne Auswahl zeigen „Noch offen“; ihnen wird keine Präferenz zugeordnet. Alte Clients ohne dieses Feld behalten beim Speichern eine bereits gesetzte Auswahl. Andere Werte werden serverseitig abgewiesen. `tests/server-mode.sql` prüft die Speicherung, Aktualisierung, Admin-Zugriffe und die sechs ausdrücklich öffentlichen Felder mit anschließendem Rollback.
