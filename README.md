@@ -2,6 +2,8 @@
 
 Eine statische, responsive HIVE-Seite für GitHub Pages. Einträge werden in Supabase/PostgreSQL gespeichert; GitHub Pages allein kann keine gemeinsam bearbeitbare Datenbank betreiben.
 
+Live-Seite: [flyleaf1502.github.io/hive](https://flyleaf1502.github.io/hive/) · Repository: [flyleaf1502/hive](https://github.com/flyleaf1502/hive)
+
 ## Einrichten
 
 1. Ein kostenloses [Supabase-Projekt](https://supabase.com/dashboard) anlegen. In **SQL Editor** den Inhalt von [`db/supabase.sql`](db/supabase.sql) ausführen. Das Skript ist für ein frisches Projekt gedacht. Wenn die Tabelle bereits besteht, müssen die neuen Spalten zuerst per Migration ergänzt werden.
@@ -15,17 +17,19 @@ Eine statische, responsive HIVE-Seite für GitHub Pages. Einträge werden in Sup
 4. Diesen Ordner als eigenes GitHub-Repository mit Branch `main` veröffentlichen. Unter **Settings → Pages → Build and deployment** als Quelle **GitHub Actions** wählen. Der enthaltene Workflow veröffentlicht `dist/` bei jedem Push.
 5. Die veröffentlichte URL aufrufen und eine Testanmeldung machen. Den persönlichen Bearbeitungslink kopieren und eine Änderung speichern. Unter `#/uebersicht` prüfen, dass öffentlich nur Name, Rasse, Klasse, Spec und Rolle erscheinen. Unter `#/admin` mit dem Admin-Konto die vollständige Übersicht prüfen. Den Testeintrag über seinen Bearbeitungslink löschen.
 
+Für das bereits laufende HIVE-Raid-Projekt wird bei Änderungen an den Datenbankregeln nur die passende Datei unter [`db/migrations`](db/migrations) im Supabase SQL Editor ausgeführt. Das vollständige `db/supabase.sql` ist für ein neues Projekt gedacht.
+
 ## Was geschützt ist
 
 - Teilnehmer bekommen nach dem Absenden einen zufälligen geheimen Bearbeitungslink, den sie selbst kopieren müssen. Er wird nicht dauerhaft im Browser gespeichert; in der Datenbank liegt nur sein SHA-256-Hash. Über den Link können sie ihre Angaben aktualisieren oder den Eintrag dauerhaft löschen. Ohne Link ist die Selbstbearbeitung nicht möglich; der Admin kann den Eintrag weiterhin bearbeiten.
 - Unter `#/uebersicht` sind **Name, Rasse, Klasse, Spec und Rolle** aller Anmeldungen öffentlich sichtbar. Die dafür eingerichtete SQL-Funktion gibt genau diese fünf Felder zurück.
-- Die vollständige Tabelle ist nicht öffentlich lesbar. Die Admin-Seite unter `#/admin` zeigt zusätzlich alle Antworten, Raidtage, Uhrzeiten und Discordnamen; sie und alle Admin-Änderungen erfordern einen angemeldeten, in `hive_admins` freigeschalteten Nutzer. Die SQL-Funktionen prüfen den Bearbeitungslink serverseitig.
+- Die vollständige Tabelle ist nicht öffentlich lesbar. Die Admin-Seite unter `#/admin` zeigt zusätzlich alle Antworten, Raidtage, Uhrzeiten und Discordnamen; sie sowie das Bearbeiten und Löschen von Einträgen erfordern einen angemeldeten, in `hive_admins` freigeschalteten Nutzer. Die SQL-Funktionen prüfen den persönlichen Bearbeitungslink serverseitig.
 - Der öffentliche publishable key bzw. ältere anon JWT ist bewusst für den Browser bestimmt. Zugriffsschutz erfolgt durch Datenbankrechte und Row Level Security. Ein privater `secret`-/`service_role`-Schlüssel darf nie in GitHub oder im Browser liegen.
 - Neue Anmeldungen sind serverseitig pro Verbindung und insgesamt begrenzt. Dafür speichert die Datenbank einen mit einem privaten Schlüssel erzeugten IP-Hash höchstens einen Tag; die rohe IP wird nicht in der HIVE-Tabelle abgelegt. Das Limit schützt vor einem Überfluten der öffentlichen Liste, ersetzt aber keinen Schutz am API-Gateway gegen massenhaft ungültige Anfragen.
 
 ## Raidzeiten
 
-Teilnehmer wählen maximal vier Raidtage pro Woche. Außerdem geben sie an, ab wann sie frühestens können (`18:00`, `18:30`, `19:00`, `19:30` oder `20:00 Uhr`) und bis wann sie maximal können (`22:00`, `22:30` oder `23:00 Uhr`). Beide Zeitangaben sind Pflichtfelder und lassen sich über den persönlichen Bearbeitungslink aktualisieren.
+Teilnehmer wählen maximal vier Raidtage pro Woche. Außerdem geben sie an, ab wann sie frühestens können (`18:30`, `19:00`, `19:30` oder `20:00 Uhr`) und bis wann sie maximal können (`22:00`, `22:30` oder `23:00 Uhr`). Beide Zeitangaben sind Pflichtfelder und lassen sich über den persönlichen Bearbeitungslink aktualisieren. „Kennen wir uns?“ ist optional.
 
 ## Lokal ansehen
 

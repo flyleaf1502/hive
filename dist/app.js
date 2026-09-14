@@ -38,7 +38,7 @@ const displayChoice = (value) => value === "Not sure yet" ? "Noch nicht sicher" 
 const choice = (group) => $( `input[name="${group}_choice"]:checked`, form)?.value || "";
 const selectedClass = () => classes.find((item) => item.name === choice("class"));
 const derivedRole = () => selectedClass()?.specs.find(([spec]) => spec === choice("spec"))?.[1] || "Flexible";
-const state = { mode: "create", editId: null, editToken: null, entries: [], publicEntries: [], auth: null, editLoadVersion: 0 };
+const state = { mode: "create", editId: null, editToken: null, entries: [], publicEntries: [], auth: null, editLoadVersion: 0, adminDeleteEntry: null };
 const configured = () => /^https:\/\/.+\.supabase\.co\/?$/.test(SUPABASE_URL) && SUPABASE_PUBLIC_KEY && !SUPABASE_PUBLIC_KEY.startsWith("YOUR_");
 
 function renderPicker(target, group, options, selected = "") {
@@ -462,6 +462,15 @@ function detail(label, value, className = "roster-detail") {
   return box;
 }
 
+function openAdminDeleteDialog(entry) {
+  state.adminDeleteEntry = { id: entry.id, name: entry.name };
+  $("#delete-title").textContent = "Eintrag wirklich löschen?";
+  $("#delete-description").textContent = `Der Eintrag von ${entry.name} wird dauerhaft aus der öffentlichen Liste und der Admin-Übersicht entfernt.`;
+  $("#confirm-delete").textContent = "Ja, Eintrag löschen";
+  showError($("#delete-error"), "");
+  $("#delete-dialog").showModal();
+}
+
 function expandedInfo(entry) {
   const area = element("div", "roster-expanded");
   for (const [label, value] of [
@@ -544,7 +553,13 @@ function renderDashboard() {
       if (existing) { existing.remove(); toggle.setAttribute("aria-expanded", "false"); }
       else { row.append(expandedInfo(entry)); toggle.setAttribute("aria-expanded", "true"); }
     });
-    row.append(toggle);
+    const remove = element("button", "roster-edit roster-delete", "Löschen");
+    remove.type = "button";
+    remove.setAttribute("aria-label", `Eintrag von ${entry.name} löschen`);
+    remove.addEventListener("click", () => openAdminDeleteDialog(entry));
+    const actions = element("div", "roster-row-actions");
+    actions.append(toggle, remove);
+    row.append(actions);
     list.append(row);
   }
 }
@@ -593,24 +608,40 @@ $("#copy-link").addEventListener("click", async () => {
   catch { $("#edit-link").select(); showToast("Link markiert – bitte kopiere ihn mit Strg+C."); }
 });
 $("#delete-button").addEventListener("click", () => {
+  state.adminDeleteEntry = null;
+  $("#delete-title").textContent = "Wirklich raus aus dem Raid?";
+  $("#delete-description").textContent = "Deine Angaben werden dauerhaft entfernt. Mit diesem Bearbeitungslink kannst du sie danach nicht mehr aufrufen.";
+  $("#confirm-delete").textContent = "Ja, Anmeldung löschen";
   showError($("#delete-error"), "");
   $("#delete-dialog").showModal();
 });
 $("#cancel-delete").addEventListener("click", () => $("#delete-dialog").close());
 $("#confirm-delete").addEventListener("click", async () => {
   const button = $("#confirm-delete");
-  setBusy(button, true, "Ja, Anmeldung löschen");
+  const target = state.adminDeleteEntry;
+  const idleText = target ? "Ja, Eintrag löschen" : "Ja, Anmeldung löschen";
+  setBusy(button, true, idleText);
   try {
-    const deleted = await rpc("hive_delete_registration", { p_id: state.editId, p_token: state.editToken });
-    if (!deleted) throw new Error("Der Bearbeitungslink ist ungültig oder der Eintrag wurde bereits gelöscht.");
-    $("#delete-dialog").close();
-    resetForm();
-    location.hash = "#/willkommen";
-    showToast("Deine Anmeldung wurde gelöscht.");
+    if (target) {
+      const auth = await ensureAuth();
+      const deleted = await request(`/rest/v1/registrations?id=eq.${encodeURIComponent(target.id)}&select=id`, { method: "DELETE", token: auth.access_token, headers: { Prefer: "return=representation" } });
+      if (!deleted?.length) throw new Error("Der Eintrag wurde bereits entfernt.");
+      $("#delete-dialog").close();
+      state.adminDeleteEntry = null;
+      await loadEntries();
+      showToast(`Eintrag von ${target.name} gelöscht.`);
+    } else {
+      const deleted = await rpc("hive_delete_registration", { p_id: state.editId, p_token: state.editToken });
+      if (!deleted) throw new Error("Der Bearbeitungslink ist ungültig oder der Eintrag wurde bereits gelöscht.");
+      $("#delete-dialog").close();
+      resetForm();
+      location.hash = "#/willkommen";
+      showToast("Deine Anmeldung wurde gelöscht.");
+    }
   } catch (error) {
     showError($("#delete-error"), error.message);
   } finally {
-    setBusy(button, false, "Ja, Anmeldung löschen");
+    setBusy(button, false, idleText);
   }
 });
 $("#logout-button").addEventListener("click", async () => {

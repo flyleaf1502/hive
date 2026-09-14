@@ -7,14 +7,14 @@ create table if not exists public.registrations (
   id uuid primary key default gen_random_uuid(),
   edit_token_hash text not null unique,
   name text not null check (char_length(name) between 1 and 80),
-  knows_us text not null check (char_length(knows_us) between 1 and 200),
+  knows_us text not null default '' check (char_length(knows_us) <= 200),
   race text not null check (char_length(race) between 1 and 80),
   class_name text not null check (char_length(class_name) between 1 and 80),
   spec text not null check (char_length(spec) between 1 and 80),
   role text not null check (role in ('Tank', 'Healer', 'Damage', 'Flexible')),
   days text[] not null check (cardinality(days) between 1 and 7),
   max_raid_days integer not null check (max_raid_days between 1 and 4),
-  earliest_start text not null check (earliest_start in ('18:00', '18:30', '19:00', '19:30', '20:00')),
+  earliest_start text not null check (earliest_start in ('18:30', '19:00', '19:30', '20:00')),
   latest_end text not null check (latest_end in ('22:00', '22:30', '23:00')),
   raid_vision text not null check (char_length(raid_vision) between 1 and 1000),
   discord_name text not null check (char_length(discord_name) between 1 and 80),
@@ -33,7 +33,7 @@ alter table public.registrations enable row level security;
 alter table public.hive_admins enable row level security;
 revoke all on public.registrations from anon, authenticated;
 revoke all on public.hive_admins from anon, authenticated;
-grant select, update on public.registrations to authenticated;
+grant select, update, delete on public.registrations to authenticated;
 
 create or replace function public.hive_is_admin()
 returns boolean
@@ -56,6 +56,10 @@ create policy hive_admin_select on public.registrations
 drop policy if exists hive_admin_update on public.registrations;
 create policy hive_admin_update on public.registrations
   for update to authenticated using (public.hive_is_admin()) with check (public.hive_is_admin());
+
+drop policy if exists hive_admin_delete on public.registrations;
+create policy hive_admin_delete on public.registrations
+  for delete to authenticated using (public.hive_is_admin());
 
 create or replace function public.hive_set_updated_at()
 returns trigger language plpgsql set search_path = '' as $$
@@ -107,7 +111,7 @@ begin
     raise exception 'Ungültige Anmeldung.';
   end if;
   if char_length(trim(coalesce(p_entry->>'name', ''))) not between 1 and 80
-    or char_length(trim(coalesce(p_entry->>'knows_us', ''))) not between 1 and 200
+    or char_length(trim(coalesce(p_entry->>'knows_us', ''))) > 200
     or char_length(trim(coalesce(p_entry->>'race', ''))) not between 1 and 80
     or char_length(trim(coalesce(p_entry->>'class_name', ''))) not between 1 and 80
     or char_length(trim(coalesce(p_entry->>'spec', ''))) not between 1 and 80
@@ -138,7 +142,7 @@ begin
   if v_max_days not between 1 and 4 then
     raise exception 'Die Zahl der Raidtage muss zwischen 1 und 4 liegen.';
   end if;
-  if not coalesce((p_entry->>'earliest_start') in ('18:00', '18:30', '19:00', '19:30', '20:00'), false) then
+  if not coalesce((p_entry->>'earliest_start') in ('18:30', '19:00', '19:30', '20:00'), false) then
     raise exception 'Bitte wähle eine gültige früheste Startzeit.';
   end if;
   if not coalesce((p_entry->>'latest_end') in ('22:00', '22:30', '23:00'), false) then
