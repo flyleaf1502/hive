@@ -8,14 +8,14 @@ Die bisherige Adresse [flyleaf1502.github.io/hive/](https://flyleaf1502.github.i
 
 - Teilnehmer melden sich über Discord an. Pro Konto gibt es genau eine Rückmeldung; nach erneutem Login werden die eigenen Angaben zum Bearbeiten geladen. Es gibt keine persönlichen Bearbeitungslinks mehr.
 - Der Discordname stammt serverseitig aus der verifizierten Discord-Identität. Er wird nicht in einem Formular eingegeben und bleibt ausschließlich in der eigenen Rückmeldung und Admin-Ansicht sichtbar.
-- Öffentlich gibt `hive_public_roster` genau **Name, Race, Class, Spec, Rolle und bevorzugten Server (PVE/PVP/Mir egal)** zurück. Die vollständige Tabelle bleibt durch RLS nur für freigeschaltete Admins zugänglich.
+- Öffentlich gibt `hive_public_roster` genau **Name, Race, Class, Spec, Rolle, bevorzugten Server (PVE/PVP/Mir egal) und Raid-Vorstellung** zurück. Die vollständige Tabelle bleibt durch RLS nur für freigeschaltete Admins zugänglich.
 - Der Admin-Login bleibt separat unter `#/admin`, mit E-Mail/Passwort und Freischaltung über `hive_admins`. Ein normales Discord-Konto erhält keine Admin-Rechte.
 - Teilnehmer lesen, speichern und löschen ausschließlich über die drei `hive_*_my_registration`-RPCs. Diese bestimmen den Eigentümer aus `auth.uid()`, prüfen eine Discord-Identität und ignorieren vom Client mitgesendete Eigentümer oder Discordnamen. Die früheren Token-RPCs sind für `anon` und `authenticated` gesperrt.
 - Supabase speichert die OAuth-E-Mail im Auth-Dienst; die Raid-Tabelle enthält keine E-Mail. Sitzungen liegen im Session Storage des jeweiligen Tabs. OAuth verwendet PKCE; Client-Secret und Service-Role-Key gehören niemals in `dist/` oder Git.
 
 ## Einrichtung
 
-1. Für eine neue Datenbank `db/supabase.sql` ausführen. Für das laufende Projekt ausschließlich gezielte Migrationen unter `db/migrations` verwenden; zuletzt `2026-09-14-server-mode-any.sql`.
+1. Für eine neue Datenbank `db/supabase.sql` ausführen. Für das laufende Projekt ausschließlich gezielte Migrationen unter `db/migrations` verwenden; zuletzt `2026-09-14-public-raid-vision.sql`.
 2. In Supabase Authentication einen Admin mit E-Mail/Passwort anlegen und seine UUID in `public.hive_admins(user_id)` eintragen.
 3. `dist/config.js` enthält nur die öffentliche Supabase-URL und den Publishable Key.
 4. Discord-App **HIVE FOREVER**, Client-ID `1549126667295785110`: OAuth2-Redirect `https://amsmtoxjkitcwzumwyuz.supabase.co/auth/v1/callback`. Das Client-Secret direkt im Supabase-Discord-Anbieter speichern. [Konfiguration und Prüfungen](docs/discord-login.md).
@@ -45,4 +45,4 @@ Das statische HELLO-Emoji zeigt den Clown-Pepe beim Dab. Es stammt aus [„Honk 
 
 ## Bevorzugter Server
 
-Die Anmeldung fragt PVE, PVP oder „Mir egal“ ab und lädt die Auswahl beim Bearbeiten wieder. Sie ist auch öffentlich als kleines Badge sichtbar. „Mir egal“ wird als `ANY` gespeichert; die Auswahl verwendet drei zusammengehörige, mit dem eingebauten Imagegen-Tool erzeugte Fantasy-Icons: Dungeonportal, gekreuzte Schwerter und Kompass. [Dateien und vollständige Prompts](docs/server-icons.md) sind dokumentiert. Ältere Rückmeldungen ohne Auswahl zeigen „Noch offen“; ihnen wird keine Präferenz zugeordnet. Alte Clients ohne dieses Feld behalten beim Speichern eine bereits gesetzte Auswahl. Andere Werte werden serverseitig abgewiesen. `tests/server-mode.sql` prüft die Speicherung, Aktualisierung, Admin-Zugriffe und die sechs ausdrücklich öffentlichen Felder mit anschließendem Rollback.
+Die Anmeldung fragt PVE, PVP oder „Mir egal“ ab und lädt die Auswahl beim Bearbeiten wieder. Sie ist auch öffentlich als kleines Badge sichtbar. „Mir egal“ wird als `ANY` gespeichert; die Auswahl verwendet drei zusammengehörige, mit dem eingebauten Imagegen-Tool erzeugte Fantasy-Icons: Dungeonportal, gekreuzte Schwerter und Kompass. [Dateien und vollständige Prompts](docs/server-icons.md) sind dokumentiert. Ältere Rückmeldungen ohne Auswahl zeigen „Noch offen“; ihnen wird keine Präferenz zugeordnet. Alte Clients ohne dieses Feld behalten beim Speichern eine bereits gesetzte Auswahl. Andere Werte werden serverseitig abgewiesen. `tests/server-mode.sql` prüft die Speicherung, Aktualisierung, Admin-Zugriffe und die sieben ausdrücklich öffentlichen Felder mit anschließendem Rollback.
