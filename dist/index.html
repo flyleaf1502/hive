@@ -26,7 +26,7 @@
           <a href="#/anmeldung" data-nav="signup">Anmeldung</a>
           <a href="#/uebersicht" data-nav="public">Raid-Übersicht</a>
         </nav>
-        <a class="header-cta" href="#/anmeldung">ICH HAB BOCK! <span aria-hidden="true">↗</span></a>
+        <a class="header-cta" href="#/anmeldung">Auf Geht's! <span aria-hidden="true">↗</span></a>
         <button class="menu-toggle" type="button" aria-label="Menü öffnen" aria-expanded="false">☰</button>
       </header>
 
@@ -39,19 +39,14 @@
               <h1 id="welcome-title">HIVE<br /><em>FOREVER?</em><span class="hero-smile"> 😎</span></h1>
               <p class="hero-lead">Die Pause war lang genug, wir möchten HIVE wieder zum Leben erwecken! Nach dem BlizzCon-Announcement haben sich schon viele aus der alten Runde bei mir gemeldet. Nun wollen wir etwas Form in die Planung bringen.</p>
               <div class="hero-actions">
-                <a class="button button-primary" href="#/anmeldung">Ich möchte dabei sein! <span aria-hidden="true">↗</span></a>
+                <a class="button button-primary" href="#/anmeldung">Let's fucking go! <span aria-hidden="true">↗</span></a>
                 <a class="button button-ghost" href="#brief">Ein paar Worte von Leysah <span aria-hidden="true">↓</span></a>
               </div>
               <div class="hero-footnote"><span class="small-rule"></span> FÜR EX-HIVE BOYS, FRIENDS &amp; FAMILY</div>
             </div>
-            <div class="hero-art" aria-label="HIVE Gildenlogo">
-              <div class="crest-frame">
-                <img src="./assets/hive-logo.jpg" alt="HIVE GUILD Logo" />
-              </div>
-            </div>
           </div>
 
-          <div class="ticker" aria-label="Gildenmotto"><span>SORRY LEUDE</span><b>✦</b><span>Ackchyually</span><b>✦</b><span>ICH WILL LOOOOOOT</span></div>
+          <div class="ticker" aria-label="Gildenmotto"><span>SORRY LEUDE</span><b>✦</b><span>Ackchyually</span><b>✦</b><span>ICH WILL LOOOOOOT</span><b>✦</b><span>UNLUCKY</span></div>
 
           <article id="brief" class="letter-section">
             <div class="letter-heading">
@@ -67,7 +62,7 @@
               <p>Diese Anmeldung ist zunächst für Ex-HIVE-Leute und ihre Freunde oder Bekannten gedacht. Externes Recruiting starten wir erst, wenn klar ist, was noch fehlt. Am liebsten würde ich den Raid mit möglichst vielen aus der alten Runde wiederbeleben. Wenn ihr Leute kennt, die gut zu uns passen, gebt den Link gern weiter.</p>
               <p>So, das war eigentlich schon wieder zu viel Text. Nazgral hat eh schon aufgehört zu lesen – deshalb reicht’s fürs Erste.</p>
               <p class="letter-signoff">Viele Grüße,<br /><strong>Leysah <span>aka Christian</span></strong></p>
-              <div class="letter-ps"><span>P.S.</span><p>Für Updates kommt bitte wieder ins HIVE-Discord. Wir werden uns abends auch wieder öfter im Voice blicken lassen. Wer Lust hat: einfach reinschauen.</p></div>
+              <div class="letter-ps"><span>P.S.</span><p>Für Updates kommt bitte wieder ins HIVE-Discord. Das Discord wird zeitnah komplett aufgeräumt und vorbereitet, ich werde dann die Rechte so updaten, damit ihr die Updates sehen könnt. Wir werden uns abends auch wieder öfter im Voice blicken lassen. Wer Lust hat: einfach reinschauen.</p></div>
               <a class="discord-link" href="https://discord.gg/HcqwdfamRW" target="_blank" rel="noopener noreferrer"><span class="discord-icon" aria-hidden="true"><img src="./assets/discord.svg" alt="" /></span><span><strong>HIVE Discord</strong><small>Achtung: Discordserver mit hohem Durchschnittsalter</small></span><span aria-hidden="true">↗</span></a>
             </div>
           </article>
@@ -84,8 +79,8 @@
                 <label class="field"><span>Name <b>*</b></span><input name="name" autocomplete="nickname" maxlength="80" placeholder="Ähm ja, wer bist du? 😄" required /></label>
                 <label class="field"><span>Kennen wir uns? 👀</span><textarea name="knows_us" class="compact-textarea" rows="5" maxlength="200" placeholder="Falls nicht offensichtlich oder Friends & Family: Bitte kurz nachhelfen bzw. wer ist euer Kontakt bei uns?"></textarea></label>
               </div>
-                <fieldset class="choice-field"><legend>Rasse <b>*</b></legend><div id="race-picker" class="choice-grid race-grid"></div></fieldset>
-                <fieldset class="choice-field"><legend>Klasse <b>*</b></legend><div id="class-picker" class="choice-grid class-grid"></div></fieldset>
+                <fieldset class="choice-field" aria-describedby="race-note"><legend>Race <b>*</b></legend><p id="race-note">Ja, wir müssen leider Horde spielen sonst weinen unsere männlichen Orc Spieler 😂</p><div id="race-picker" class="choice-grid race-grid"></div></fieldset>
+                <fieldset class="choice-field"><legend>Class <b>*</b></legend><div id="class-picker" class="choice-grid class-grid"></div></fieldset>
                 <fieldset class="choice-field"><legend>Spec <b>*</b></legend><div id="spec-picker" class="choice-grid spec-grid"><div class="choice-prompt">Wähle zuerst eine Klasse.</div></div></fieldset>
                 <div class="role-result" aria-live="polite"><span>Rolle</span><img id="derived-role-icon" alt="" hidden /><strong id="derived-role">–</strong><small>Die Rolle wird automatisch aus dem Spec abgeleitet.</small></div>
               </div>
@@ -150,7 +145,7 @@
         <div class="footer-brand">HIVE <span>GUILD</span></div>
         <a href="https://discord.gg/HcqwdfamRW" target="_blank" rel="noopener noreferrer">Discord ↗</a>
         <span>© HIVE GUILD</span>
-        <details class="icon-credits"><summary>Bild-Credits</summary><div>Klassen-, Spec-, Rollen- und Rassenbilder: © Blizzard Entertainment; Originale von <a href="https://worldofwarcraft.blizzard.com/en-us/game/classes" target="_blank" rel="noopener noreferrer">World of Warcraft</a>. Titelillustration vom Betreiber bereitgestellt, mit Horley-Signatur. Skyborne-Platzhalter: <a href="https://game-icons.net/1x1/delapouite/elf-ear.html" target="_blank" rel="noopener noreferrer">„Elf ear“ von Delapouite</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, für HIVE farbig angepasst.</div></details>
+        <details class="icon-credits"><summary>Bild-Credits</summary><div>Klassen-, Spec-, Rollen- und Rassenbilder: © Blizzard Entertainment; Originale von <a href="https://worldofwarcraft.blizzard.com/en-us/game/classes" target="_blank" rel="noopener noreferrer">World of Warcraft</a>. WoW-Forever-Hintergrund vom Betreiber bereitgestellt. Skyborne-Platzhalter: <a href="https://game-icons.net/1x1/delapouite/elf-ear.html" target="_blank" rel="noopener noreferrer">„Elf ear“ von Delapouite</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, für HIVE farbig angepasst.</div></details>
       </footer>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
