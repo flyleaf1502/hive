@@ -22,8 +22,10 @@ begin
   if updated->>'id' <> saved->>'id' or updated->>'server_mode' <> 'PVE' then raise exception 'PVE save failed'; end if;
   updated := public.hive_save_my_registration(entry || '{"server_mode":"PVP"}');
   if public.hive_get_my_registration()->>'server_mode' <> 'PVP' then raise exception 'PVP update/read failed'; end if;
+  updated := public.hive_save_my_registration(entry || '{"server_mode":"ANY"}');
+  if public.hive_get_my_registration()->>'server_mode' <> 'ANY' then raise exception 'No-preference update/read failed'; end if;
   updated := public.hive_save_my_registration(entry);
-  if updated->>'server_mode' <> 'PVP' then raise exception 'Legacy update erased preference'; end if;
+  if updated->>'server_mode' <> 'ANY' then raise exception 'Legacy update erased preference'; end if;
   for bad in select value from jsonb_array_elements('["PVE/PVP","pvp","",null,42]') loop
     rejected := false;
     begin
@@ -55,4 +57,4 @@ begin
   if not rejected then raise exception 'Anonymous raw table access allowed'; end if;
 end; $$;
 rollback;
-select 'PASS: PVE/PVP save, edit, reload, legacy preservation, invalid values, account isolation, admin edit, six public fields and anonymous table isolation; all test data rolled back' as verification;
+select 'PASS: PVE/PVP/ANY save, edit, reload, legacy preservation, invalid values, account isolation, admin edit, six public fields and anonymous table isolation; all test data rolled back' as verification;
