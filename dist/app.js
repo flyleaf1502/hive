@@ -1,4 +1,5 @@
 import { SUPABASE_URL, SUPABASE_PUBLIC_KEY } from "./config.js";
+import { isRaceClassAllowed, selectionForRace } from "./race-classes.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -51,6 +52,7 @@ function renderPicker(target, group, options, selected = "") {
     input.name = `${group}_choice`;
     input.value = option.name;
     input.required = true;
+    input.disabled = Boolean(option.disabled);
     input.checked = option.name === selected;
     const card = document.createElement("span");
     card.className = "choice-tile-inner";
@@ -97,12 +99,39 @@ function updateDerivedRole() {
   if (role !== "–") icon.src = iconUrl(roleIcons[role]);
 }
 
+function updateRaceAvailability(className = choice("class")) {
+  for (const input of $$("input[name=race_choice]", form)) {
+    input.disabled = Boolean(className) && !isRaceClassAllowed(input.value, className);
+  }
+}
+
+function renderClasses(raceName = choice("race"), className = "", spec = "") {
+  const selection = selectionForRace(raceName || "Not sure yet", className, spec);
+  const options = classes.map((item) => ({ ...item, disabled: Boolean(raceName) && !isRaceClassAllowed(raceName, item.name) }));
+  renderPicker($("#class-picker"), "class", options, selection.className);
+  updateRaceAvailability(selection.className);
+  renderSpecs(selection.className, selection.spec);
+}
+
 function renderAllPickers() {
   renderPicker($("#race-picker"), "race", races);
-  renderPicker($("#class-picker"), "class", classes);
-  renderSpecs("");
-  $("#class-picker").addEventListener("change", () => renderSpecs(choice("class")));
+  renderClasses();
+  $("#race-picker").addEventListener("change", () => {
+    const previousClass = choice("class");
+    const previousSpec = choice("spec");
+    renderClasses(choice("race"), previousClass, previousSpec);
+    if (previousClass && !choice("class")) showToast("Diese Class passt nicht zur gewählten Race. Bitte wähle Class und Spec neu.");
+  });
+  $("#class-picker").addEventListener("change", () => {
+    updateRaceAvailability();
+    renderSpecs(choice("class"));
+  });
   $("#spec-picker").addEventListener("change", updateDerivedRole);
+  $("#reset-character-choices").addEventListener("click", () => {
+    renderPicker($("#race-picker"), "race", races);
+    renderClasses("");
+    showError($("#form-error"), "");
+  });
 }
 
 function showToast(message) {
@@ -189,20 +218,18 @@ function fillForm(entry) {
     if (input) input.checked = true;
   };
   selectChoice("race", entry.race);
-  selectChoice("class", entry.class_name);
-  renderSpecs(entry.class_name, entry.spec);
-  updateDerivedRole();
+  renderClasses(entry.race, entry.class_name, entry.spec);
   $$("input[name=days]", form).forEach((input) => { input.checked = entry.days?.includes(input.value) || false; });
 }
 
 function resetForm() {
   form.reset();
-  renderSpecs("");
+  renderClasses("");
   state.mode = "create";
   state.editId = null;
   state.editToken = null;
   $("#form-mode-label").textContent = "ANMELDUNG";
-  $("#form-heading").textContent = "Dein HIVE-Comeback?";
+  $("#form-heading").textContent = "DEIN (HIVE)-COMEBACK";
   $("#delete-button").hidden = true;
   $("#submit-button").innerHTML = 'LET’S FUCKING GO! <span aria-hidden="true">↗</span>';
   showError($("#form-error"), "");
@@ -221,7 +248,7 @@ function setEditMode(entry, id, token, isAdmin = false) {
   $("#submit-button").innerHTML = 'Änderungen speichern <span aria-hidden="true">↗</span>';
   $(".form-layout").hidden = false;
   $("#signup-success").hidden = true;
-  showError($("#form-error"), "");
+  showError($("#form-error"), isRaceClassAllowed(entry.race, entry.class_name) ? "" : "Die bisherige Race-/Class-Kombination ist in WoW Forever nicht verfügbar. Bitte wähle Class und Spec neu, bevor du speicherst.");
 }
 
 async function submitRegistration(event) {
@@ -231,6 +258,10 @@ async function submitRegistration(event) {
   const entry = readForm();
   if (!entry.race || !entry.class_name || !entry.spec) {
     showError($("#form-error"), "Bitte wähle Rasse, Klasse und Spec aus.");
+    return;
+  }
+  if (!isRaceClassAllowed(entry.race, entry.class_name)) {
+    showError($("#form-error"), "Bitte wähle eine gültige Race-/Class-Kombination für die Horde.");
     return;
   }
   if (!entry.days.length) {
@@ -581,7 +612,7 @@ async function loadOwnEntry(id, token, version) {
 
 function route() {
   const editLoadVersion = ++state.editLoadVersion;
-  const hash = location.hash || "#/willkommen";
+  const hash = location.hash || (/\/anmeldung\/?$/.test(location.pathname) ? "#/anmeldung" : "#/willkommen");
   const edit = hash.match(/^#\/bearbeiten\/([0-9a-f-]{36})\/([0-9a-f]{64})$/i);
   const view = edit || hash === "#/anmeldung" ? "signup" : hash === "#/uebersicht" ? "public" : hash === "#/admin" ? "admin" : "welcome";
   Object.entries(views).forEach(([name, node]) => { node.hidden = name !== view; });

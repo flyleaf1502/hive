@@ -2,7 +2,9 @@
 
 Eine statische, responsive HIVE-Seite für GitHub Pages. Einträge werden in Supabase/PostgreSQL gespeichert; GitHub Pages allein kann keine gemeinsam bearbeitbare Datenbank betreiben.
 
-Live-Seite: [flyleaf1502.github.io/hive](https://flyleaf1502.github.io/hive/) · Repository: [flyleaf1502/hive](https://github.com/flyleaf1502/hive)
+Live-Seite: [hive-guild.github.io/anmeldung/](https://hive-guild.github.io/anmeldung/) · Repository: [hive-guild/hive-guild.github.io](https://github.com/hive-guild/hive-guild.github.io)
+
+Die bisherige Adresse [flyleaf1502.github.io/hive](https://flyleaf1502.github.io/hive/) bleibt aktiv. Beide Veröffentlichungen verwenden dieselbe Supabase-Datenbank. Änderungen werden mit `git push origin main` und `git push hive-pages main` in beide Repositories veröffentlicht.
 
 ## Einrichten
 
@@ -31,11 +33,15 @@ Für das bereits laufende HIVE-Raid-Projekt wird bei Änderungen an den Datenban
 
 Teilnehmer wählen maximal vier Raidtage pro Woche. Außerdem geben sie an, ab wann sie frühestens können (`18:30`, `19:00`, `19:30` oder `20:00 Uhr`) und bis wann sie maximal können (`22:00`, `22:30` oder `23:00 Uhr`). Beide Zeitangaben sind Pflichtfelder und lassen sich über den persönlichen Bearbeitungslink aktualisieren. „Kennen wir uns?“ ist optional.
 
+## Race und Class
+
+Die Class-Auswahl richtet sich nach den angekündigten Horde-Kombinationen für WoW Forever. [Matrix, Quellen und Verhalten beim Race-Wechsel](docs/race-class-combinations.md) sind dokumentiert. Für das laufende Projekt ergänzt `db/migrations/2026-09-14-forever-race-class-combinations.sql` die serverseitige Prüfung ohne historische Daten zu verändern.
+
 ## Lokal ansehen
 
 `dist/index.html` benötigt einen kleinen HTTP-Server, weil es JavaScript-Module lädt. Beispielsweise im Repository-Verzeichnis: `npx serve dist`. Ohne Supabase-Konfiguration ist die Gestaltung sichtbar, Speichern und Admin-Login zeigen einen verständlichen Einrichtungsfehler.
 
-Die Seite hat keine Laufzeit-Abhängigkeiten und keinen Build-Schritt. Die HTML-, CSS- und JavaScript-Dateien in `dist/` können direkt bearbeitet werden.
+Die Seite hat keine Laufzeit-Abhängigkeiten. Die HTML-, CSS- und JavaScript-Dateien in `dist/` können direkt bearbeitet werden. Nach HTML-Änderungen erzeugt `node scripts/build-pages.mjs` die direkte Anmeldeseite unter `/anmeldung/` aus `dist/index.html`. Der Pages-Workflow führt diesen Schritt und die Race-/Class-Prüfungen automatisch aus. Die bisherigen Hash- und Bearbeitungslinks funktionieren weiterhin.
 
 ## Icons
 

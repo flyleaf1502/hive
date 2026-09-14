@@ -3,6 +3,24 @@
 
 create extension if not exists pgcrypto with schema extensions;
 
+-- Horde matrix: Blizzard BlizzCon 2026, checked 2026-09-14.
+create or replace function public.hive_race_class_allowed(p_race text, p_class text)
+returns boolean language sql immutable set search_path = '' as $$
+  select coalesce(case
+    when p_class = 'Not sure yet' then p_race in ('Orc','Troll','Tauren','Undead','Skyborne','Not sure yet')
+    when p_race = 'Not sure yet' then p_class in ('Warrior','Hunter','Rogue','Druid','Shaman','Mage','Warlock','Priest','Paladin')
+    when p_race = 'Orc' then p_class in ('Warrior','Hunter','Rogue','Shaman','Mage','Warlock')
+    when p_race = 'Troll' then p_class in ('Warrior','Hunter','Rogue','Priest','Shaman','Mage','Warlock')
+    when p_race = 'Tauren' then p_class in ('Warrior','Hunter','Shaman','Druid')
+    when p_race = 'Undead' then p_class in ('Warrior','Paladin','Rogue','Priest','Mage','Warlock')
+    when p_race = 'Skyborne' then p_class in ('Warrior','Hunter','Rogue','Shaman','Druid')
+    else false
+  end, false);
+$$;
+
+revoke all on function public.hive_race_class_allowed(text, text) from public;
+grant execute on function public.hive_race_class_allowed(text, text) to anon, authenticated;
+
 create table if not exists public.registrations (
   id uuid primary key default gen_random_uuid(),
   edit_token_hash text not null unique,
@@ -19,7 +37,8 @@ create table if not exists public.registrations (
   raid_vision text not null check (char_length(raid_vision) between 1 and 1000),
   discord_name text not null check (char_length(discord_name) between 1 and 80),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint registrations_race_class_check check (public.hive_race_class_allowed(race, class_name))
 );
 
 create index if not exists registrations_role_class_idx on public.registrations (role, class_name);

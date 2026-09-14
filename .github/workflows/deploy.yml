@@ -22,6 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check frontend and prepare signup URL
+        run: |
+          node --check dist/app.js
+          node --check dist/config.js
+          node --test tests/race-classes.test.mjs
+          node scripts/build-pages.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

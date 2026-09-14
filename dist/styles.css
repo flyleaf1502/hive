@@ -128,3 +128,8 @@ body::before{display:none}
 .hero-lead{max-width:490px;font-size:17px;color:#e1e3e7}
 
 @media(max-width:1050px){.hero-grid{min-height:0;grid-template-columns:1fr;background:linear-gradient(0deg,#0d1219,transparent 22%) center top/100% 56.3vw no-repeat,url("assets/wow-forever-background-hd.png") center top/100% auto no-repeat,#0d1219}.hero-copy{padding:calc(56.3vw + 16px) 0 46px}.hero-copy h1{font-size:clamp(64px,12vw,94px)}.hero-copy .overline{margin-top:28px}.hero-lead{max-width:580px;font-size:16px}}
+
+.character-choice-help{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;flex-wrap:wrap;margin-top:25px;color:#a6b0bd;font-size:12px;line-height:1.5}
+.character-choice-help p{margin:0;flex:1 1 280px}.character-choice-help .text-button{font-size:12px;white-space:nowrap;padding:5px 0}
+.choice-tile input:disabled{cursor:not-allowed}.choice-tile input:disabled+.choice-tile-inner{opacity:.36;filter:grayscale(1);background:#161d25;border-color:#39424d;transform:none}
+.choice-tile:has(input:disabled){cursor:not-allowed}.choice-tile:has(input:disabled):hover .choice-tile-inner{background:#161d25;transform:none}
