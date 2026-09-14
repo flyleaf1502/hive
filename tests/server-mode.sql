@@ -49,7 +49,7 @@ begin
   select to_jsonb(r) into projected from public.hive_public_roster() r where r.name='HIVE Server QA' limit 1;
   if projected->>'raid_vision' <> 'Rollback test' or projected->>'server_mode' <> 'PVE' or
     (select array_agg(key order by key) from jsonb_object_keys(projected) key) <>
-    array['class_name','name','race','raid_vision','role','server_mode','spec']::text[] then
+    array['class_name','days','earliest_start','latest_end','max_raid_days','name','race','raid_vision','role','server_mode','spec']::text[] then
     raise exception 'Public projection incorrect: %',projected;
   end if;
   rejected := false;
@@ -57,4 +57,4 @@ begin
   if not rejected then raise exception 'Anonymous raw table access allowed'; end if;
 end; $$;
 rollback;
-select 'PASS: PVE/PVP/ANY save, edit, reload, legacy preservation, invalid values, account isolation, admin edit, seven public fields and anonymous table isolation; all test data rolled back' as verification;
+select 'PASS: PVE/PVP/ANY save, edit, reload, legacy preservation, invalid values, account isolation, admin edit, eleven public fields and anonymous table isolation; all test data rolled back' as verification;
