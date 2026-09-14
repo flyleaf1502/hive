@@ -133,3 +133,9 @@ body::before{display:none}
 .character-choice-help p{margin:0;flex:1 1 280px}.character-choice-help .text-button{font-size:12px;white-space:nowrap;padding:5px 0}
 .choice-tile input:disabled{cursor:not-allowed}.choice-tile input:disabled+.choice-tile-inner{opacity:.36;filter:grayscale(1);background:#161d25;border-color:#39424d;transform:none}
 .choice-tile:has(input:disabled){cursor:not-allowed}.choice-tile:has(input:disabled):hover .choice-tile-inner{background:#161d25;transform:none}
+
+/* Account sign-in and supplied guild identity. */
+.discord-account{margin:0 0 30px;padding:32px}.discord-account h2{font-size:30px}.discord-account p{color:var(--muted);margin:12px 0 22px}.button-discord{background:#5865f2;color:#fff;gap:12px}.button-discord img{width:26px;height:26px}.discord-account .text-button{margin-left:0}.character-choice-help{justify-content:flex-end}.guild-logo{display:block;object-fit:contain;height:auto}.brand .header-logo{width:70px;height:96px}.site-header{min-height:112px}.letter-stamp{padding:0;transform:none;border:0;width:86px;height:122px;background:none}.letter-stamp .guild-logo{width:86px;height:122px}.aside-logo{background:none;border:0}.aside-logo .guild-logo{width:144px;height:205px;object-fit:contain}.footer-brand .guild-logo{width:66px;height:94px}.login-logo{width:144px;max-height:205px}.success-card .button{margin:10px 8px 0 0}
+@media(max-width:760px){.site-header{min-height:94px}.brand .header-logo{width:56px;height:80px}.discord-account{padding:24px}.discord-account h2{font-size:25px}.letter-stamp{width:66px;height:94px}.letter-stamp .guild-logo{width:66px;height:94px}}
+
+.button-discord img{filter:brightness(0) invert(1)}

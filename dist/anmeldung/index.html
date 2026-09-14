@@ -19,8 +19,7 @@
     <div class="site-shell">
       <header class="site-header">
         <a class="brand" href="#/willkommen" aria-label="HIVE Startseite">
-          <span class="brand-mark">H<span></span></span>
-          <span class="brand-word">HIVE <small>GUILD</small></span>
+          <img class="guild-logo header-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" />
         </a>
         <nav class="main-nav" aria-label="Hauptnavigation">
           <a href="#/willkommen" data-nav="welcome">Willkommen</a>
@@ -56,7 +55,7 @@
               <p>Von Leysah/Christian, der sich lang genug ausgeruht hat und wieder Bock hat, etwas zu organisieren.</p>
             </div>
             <div class="letter-card">
-              <div class="letter-stamp">HIVE<br /><span>GUILD</span></div>
+              <div class="letter-stamp"><img class="guild-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /></div>
               <p>Ja, ich lebe noch! Seit dem WoW-Forever-Announcement haben sich einige aus unserem alten HIVE-Raid bei mir gemeldet. Deshalb wollte ich mal abchecken, wer bei einem Comeback als Raidgilde dabei wäre.</p>
               <p>Wir hätten richtig Lust, die alten Zeiten wiederaufleben zu lassen: HIVE zurückbringen, vernünftig raiden und hoffentlich auch ab und zu wieder ein RL-Treffen hinbekommen. So nach dem Motto: Die alten Herren gehen noch eine Runde – und zwar auf einem vernünftigen Level. Ich habe auf jeden Fall Bock. Die Pause war lang genug, und dieser Release klingt nach dem spannendsten WoW-Moment seit Jahren.</p>
               <p>Erst mal geht es darum, die groben Dinge abzustecken: Wer aus der alten Runde wäre dabei? Wie viele Raidtage passen? Wie könnte unser Setup aussehen, und welche Ziele haben wir?</p>
@@ -72,15 +71,22 @@
 
         <section id="signup-view" class="view signup-view" hidden aria-labelledby="signup-title">
           <div class="page-intro"><span class="section-index">02 / ANMELDUNG</span><h1 id="signup-title">HIVE <em>FOREVER?</em></h1><p>Kein Bewerbungsroman. Nur ein paar Infos, damit wir die Planung starten können.</p></div>
-          <div class="form-layout">
-            <div class="form-aside"><div class="aside-logo"><img src="./assets/hive-logo.jpg" alt="" /></div><p class="aside-label">NICE TO KNOW</p><h2>Ihr könnt eure Angaben<br />später updaten.</h2><p>Da manche wahrscheinlich schon während der Beta 5x rerollen werden, bekommt ihr einen persönlichen Bearbeitungslink. Speichert ihn euch irgendwo ab und updatet eure Angaben bitte entsprechend. Das hilft uns bei der Planung – vor allem, wenn es später ums öffentliche Recruiting geht.</p></div>
+          <div id="discord-account" class="discord-account registration-card">
+            <h2>DEIN DISCORD. DEINE ANMELDUNG.</h2>
+            <p id="discord-status" role="status">Anmeldung wird geprüft …</p>
+            <button id="discord-login" class="button button-discord" type="button" disabled><img src="./assets/discord.svg" alt="" />Mit Discord anmelden</button>
+            <button id="discord-logout" class="text-button" type="button" hidden>Discord abmelden</button>
+            <div id="discord-error" class="message message-error" role="alert" hidden></div>
+          </div>
+          <div class="form-layout" hidden>
+            <div class="form-aside"><div class="aside-logo"><img class="guild-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /></div><p class="aside-label">NICE TO KNOW</p><h2>Ihr könnt eure Angaben<br />später updaten.</h2><p>Da manche wahrscheinlich schon während der Beta 5x rerollen werden: Meldet euch einfach wieder mit eurem Discord-Konto an und updatet eure Angaben entsprechend. Einen extra Bearbeitungslink braucht ihr nicht. Das hilft uns bei der Planung – vor allem, wenn es später ums öffentliche Recruiting geht.</p></div>
             <form id="registration-form" class="registration-card" novalidate>
               <div class="form-head"><div><span class="form-kicker" id="form-mode-label">ANMELDUNG</span><h2 id="form-heading">DEIN (HIVE)-COMEBACK</h2></div><span class="form-head-icon">✦</span></div>
               <div class="form-section"><div class="form-section-title"><span>01</span><h3>Du &amp; dein Char</h3></div><div class="field-grid">
                 <label class="field"><span>Name <b>*</b></span><input name="name" autocomplete="nickname" maxlength="80" placeholder="Ähm ja, wer bist du? 😄" required /></label>
                 <label class="field"><span>Kennen wir uns? 👀</span><textarea name="knows_us" class="compact-textarea" rows="5" maxlength="200" placeholder="Falls nicht offensichtlich oder Friends & Family: Bitte kurz nachhelfen bzw. wer ist euer Kontakt bei uns?"></textarea></label>
               </div>
-                <div class="character-choice-help"><p>Race oder Class zuerst wählen – unpassende Kombinationen sind ausgegraut.</p><button id="reset-character-choices" class="text-button" type="button">Auswahl zurücksetzen</button></div>
+                <div class="character-choice-help"><button id="reset-character-choices" class="text-button" type="button">Auswahl zurücksetzen</button></div>
                 <fieldset class="choice-field" aria-describedby="race-note"><legend>Race <b>*</b></legend><p id="race-note">Ja, wir müssen leider Horde spielen sonst weinen unsere männlichen Orc Spieler 😂</p><div id="race-picker" class="choice-grid race-grid"></div></fieldset>
                 <fieldset class="choice-field"><legend>Class <b>*</b></legend><div id="class-picker" class="choice-grid class-grid"></div></fieldset>
                 <fieldset class="choice-field"><legend>Spec <b>*</b></legend><div id="spec-picker" class="choice-grid spec-grid"><div class="choice-prompt">Wähle zuerst eine Klasse.</div></div></fieldset>
@@ -107,11 +113,10 @@
                   <label class="field field-full"><span>Wie stellst du dir den Raid vor? <b>*</b></span><textarea name="raid_vision" rows="4" maxlength="1000" placeholder="Ziele, Parses, Speedkills, Atmosphäre – was ist dir wichtig?" required></textarea></label>
                 </div>
               </div>
-              <div class="form-section"><div class="form-section-title"><span>03</span><h3>Kontakt</h3></div><div class="field-grid"><label class="field"><span>Discordname <b>*</b></span><input name="discord_name" maxlength="80" placeholder="Dein Name im HIVE Discord" required /></label></div></div>
               <div class="form-footer"><div id="form-error" class="message message-error" role="alert" hidden></div><button id="submit-button" class="button button-primary submit-button" type="submit">LET’S FUCKING GO! <span aria-hidden="true">↗</span></button><button id="delete-button" class="delete-button" type="button" hidden>Diese Anmeldung löschen</button></div>
             </form>
           </div>
-          <div id="signup-success" class="success-card" hidden><span class="success-symbol">✦</span><span class="section-index">RÜCKMELDUNG GESPEICHERT</span><h2>WILLKOMMEN ZURÜCK.</h2><p>Dein Platz auf der Liste ist reserviert. Speichere diesen persönlichen Link, damit du deine Angaben später bearbeiten kannst.</p><div class="edit-link-row"><input id="edit-link" aria-label="Dein Bearbeitungslink" readonly /><button id="copy-link" class="button button-secondary" type="button">Link kopieren</button></div><p class="link-warning">Der Link ist dein Schlüssel zum Eintrag. Teile ihn nicht öffentlich.</p><a class="button button-ghost" href="#/willkommen">Zurück zur Startseite <span aria-hidden="true">↗</span></a></div>
+          <div id="signup-success" class="success-card" hidden><span class="success-symbol">✦</span><span class="section-index">RÜCKMELDUNG GESPEICHERT</span><h2>WILLKOMMEN ZURÜCK.</h2><p>Deine Anmeldung ist mit deinem Discord-Konto verbunden. Melde dich jederzeit wieder mit Discord an, um deine Angaben zu ändern.</p><button id="edit-my-entry" class="button button-primary" type="button">Meine Angaben bearbeiten</button><a class="button button-ghost" href="#/willkommen">Zurück zur Startseite <span aria-hidden="true">↗</span></a></div>
         </section>
 
         <section id="public-view" class="view public-view" hidden aria-labelledby="public-title">
@@ -127,7 +132,7 @@
 
         <section id="admin-view" class="view dashboard-view" hidden aria-labelledby="dashboard-title">
           <div class="page-intro"><span class="section-index">04 / RAIDLEITUNG</span><h1 id="dashboard-title">DIE <em>PLANUNG.</em></h1><p>Alle Antworten, Zeiten und Kontaktdaten für die Raidleitung.</p></div>
-          <div id="admin-login-card" class="login-layout"><div class="login-art"><div class="login-symbol">H</div><span>RAIDLEITUNG<br />ACCESS ONLY</span></div><form id="admin-login-form" class="login-card"><span class="form-kicker">ADMIN-BEREICH</span><h2>Einloggen</h2><p>Die vollständige Übersicht ist nur für die Raidleitung sichtbar.</p><label class="field"><span>E-Mail</span><input type="email" name="email" autocomplete="username" required placeholder="raidleitung@…" /></label><label class="field"><span>Passwort</span><input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" /></label><div id="login-error" class="message message-error" role="alert" hidden></div><button class="button button-primary" type="submit">Übersicht öffnen <span aria-hidden="true">↗</span></button></form></div>
+          <div id="admin-login-card" class="login-layout"><div class="login-art"><img class="guild-logo login-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /><span>RAIDLEITUNG<br />ACCESS ONLY</span></div><form id="admin-login-form" class="login-card"><span class="form-kicker">ADMIN-BEREICH</span><h2>Einloggen</h2><p>Die vollständige Übersicht ist nur für die Raidleitung sichtbar.</p><label class="field"><span>E-Mail</span><input type="email" name="email" autocomplete="username" required placeholder="raidleitung@…" /></label><label class="field"><span>Passwort</span><input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" /></label><div id="login-error" class="message message-error" role="alert" hidden></div><button class="button button-primary" type="submit">Übersicht öffnen <span aria-hidden="true">↗</span></button></form></div>
           <div id="admin-panel" class="admin-panel" hidden>
             <div class="admin-toolbar"><div><span class="admin-live"><span class="signal-dot"></span> RAID-KADER</span><h2>RÜCKMELDUNGEN</h2></div><button id="logout-button" class="text-button" type="button">Abmelden ↗</button></div>
             <div id="stats-grid" class="stats-grid" aria-live="polite"></div>
@@ -140,11 +145,11 @@
         </section>
       </main>
       <dialog id="delete-dialog" class="delete-dialog" aria-labelledby="delete-title">
-        <div class="delete-dialog-body"><span class="form-kicker">ANMELDUNG LÖSCHEN</span><h2 id="delete-title">Wirklich raus aus dem Raid?</h2><p id="delete-description">Deine Angaben werden dauerhaft entfernt. Mit diesem Bearbeitungslink kannst du sie danach nicht mehr aufrufen.</p><div id="delete-error" class="message message-error" role="alert" hidden></div><div class="delete-actions"><button id="cancel-delete" class="button button-ghost" type="button">Doch nicht</button><button id="confirm-delete" class="button button-danger" type="button">Ja, Anmeldung löschen</button></div></div>
+        <div class="delete-dialog-body"><span class="form-kicker">ANMELDUNG LÖSCHEN</span><h2 id="delete-title">Wirklich raus aus dem Raid?</h2><p id="delete-description">Deine Angaben werden dauerhaft entfernt. Du kannst dich danach mit deinem Discord-Konto erneut anmelden.</p><div id="delete-error" class="message message-error" role="alert" hidden></div><div class="delete-actions"><button id="cancel-delete" class="button button-ghost" type="button">Doch nicht</button><button id="confirm-delete" class="button button-danger" type="button">Ja, Anmeldung löschen</button></div></div>
       </dialog>
 
       <footer class="site-footer">
-        <div class="footer-brand">HIVE <span>GUILD</span></div>
+        <div class="footer-brand"><img class="guild-logo" src="./assets/hive-guild-logo.png" alt="HIVE Guild" /></div>
         <a href="https://discord.gg/HcqwdfamRW" target="_blank" rel="noopener noreferrer">Discord ↗</a>
         <span>© HIVE GUILD</span>
         <details class="icon-credits"><summary>Bild-Credits</summary><div>Klassen-, Spec-, Rollen- und Rassenbilder: © Blizzard Entertainment; Originale von <a href="https://worldofwarcraft.blizzard.com/en-us/game/classes" target="_blank" rel="noopener noreferrer">World of Warcraft</a>. WoW-Forever-Hintergrund vom Betreiber bereitgestellt; mit KI zur besseren Lesbarkeit überarbeitet. Skyborne-Platzhalter: <a href="https://game-icons.net/1x1/delapouite/elf-ear.html" target="_blank" rel="noopener noreferrer">„Elf ear“ von Delapouite</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>, für HIVE farbig angepasst.</div></details>

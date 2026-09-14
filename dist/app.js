@@ -1,3 +1,4 @@
+import { AuthClient } from "./vendor/supabase-auth.js";
 import { SUPABASE_URL, SUPABASE_PUBLIC_KEY } from "./config.js";
 import { isRaceClassAllowed, selectionForRace } from "./race-classes.js";
 
@@ -39,7 +40,7 @@ const displayChoice = (value) => value === "Not sure yet" ? "Noch nicht sicher" 
 const choice = (group) => $( `input[name="${group}_choice"]:checked`, form)?.value || "";
 const selectedClass = () => classes.find((item) => item.name === choice("class"));
 const derivedRole = () => selectedClass()?.specs.find(([spec]) => spec === choice("spec"))?.[1] || "Flexible";
-const state = { mode: "create", editId: null, editToken: null, entries: [], publicEntries: [], auth: null, editLoadVersion: 0, adminDeleteEntry: null };
+const state = { mode: "create", editId: null, editToken: null, entries: [], publicEntries: [], auth: null, editLoadVersion: 0, adminDeleteEntry: null, originalDiscordName: "" };
 const configured = () => /^https:\/\/.+\.supabase\.co\/?$/.test(SUPABASE_URL) && SUPABASE_PUBLIC_KEY && !SUPABASE_PUBLIC_KEY.startsWith("YOUR_");
 
 function renderPicker(target, group, options, selected = "") {
@@ -178,18 +179,6 @@ async function request(path, { method = "GET", body, token, headers = {} } = {})
 
 const rpc = (name, body) => request(`/rest/v1/rpc/${name}`, { method: "POST", body });
 
-function randomToken() {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function editUrl(id, token) {
-  const url = new URL(location.href);
-  url.hash = `#/bearbeiten/${id}/${token}`;
-  return url.toString();
-}
-
 function readForm() {
   const data = new FormData(form);
   return {
@@ -204,11 +193,12 @@ function readForm() {
     earliest_start: String(data.get("earliest_start") || ""),
     latest_end: String(data.get("latest_end") || ""),
     raid_vision: String(data.get("raid_vision") || "").trim(),
-    discord_name: String(data.get("discord_name") || "").trim(),
+    discord_name: state.originalDiscordName || "Discord",
   };
 }
 
 function fillForm(entry) {
+  state.originalDiscordName = entry.discord_name || "";
   for (const key of ["name", "knows_us", "max_raid_days", "earliest_start", "latest_end", "raid_vision", "discord_name"]) {
     const control = form.elements.namedItem(key);
     if (control) control.value = entry[key] ?? "";
@@ -225,6 +215,7 @@ function fillForm(entry) {
 function resetForm() {
   form.reset();
   renderClasses("");
+  state.originalDiscordName = "";
   state.mode = "create";
   state.editId = null;
   state.editToken = null;
@@ -235,6 +226,7 @@ function resetForm() {
   showError($("#form-error"), "");
   $(".form-layout").hidden = false;
   $("#signup-success").hidden = true;
+  paintParticipant();
 }
 
 function setEditMode(entry, id, token, isAdmin = false) {
@@ -272,17 +264,16 @@ async function submitRegistration(event) {
   const button = $("#submit-button");
   setBusy(button, true, state.mode === "create" ? "LET’S FUCKING GO! ↗" : "Änderungen speichern ↗");
   try {
-    if (state.mode === "create") {
-      const token = randomToken();
-      const id = await rpc("hive_create_registration", { p_entry: entry, p_token: token });
-      $("#edit-link").value = editUrl(id, token);
-      $(".form-layout").hidden = true;
-      $("#signup-success").hidden = false;
-      $("#signup-success").scrollIntoView({ behavior: "smooth", block: "start" });
-    } else if (state.mode === "edit") {
-      await rpc("hive_update_registration", { p_id: state.editId, p_token: state.editToken, p_entry: entry });
-      showToast("Deine Änderungen sind gespeichert.");
-      $("#form-error").hidden = true;
+    if (state.mode !== "admin-edit") {
+      const wasCreate = state.mode === "create";
+      const saved = await request('/rest/v1/rpc/hive_save_my_registration', { method: 'POST', body: { p_entry: entry }, token: await participantToken() });
+      setEditMode(saved, saved.id, null);
+      state.mode = 'own-edit';
+      if (wasCreate) {
+        $(".form-layout").hidden = true;
+        $("#signup-success").hidden = false;
+        $("#signup-success").scrollIntoView({ behavior: "smooth", block: "start" });
+      } else showToast("Deine Änderungen sind gespeichert.");
     } else {
       const auth = await ensureAuth();
       await request(`/rest/v1/registrations?id=eq.${encodeURIComponent(state.editId)}`, { method: "PATCH", body: entry, token: auth.access_token, headers: { Prefer: "return=minimal" } });
@@ -595,21 +586,6 @@ function renderDashboard() {
   }
 }
 
-async function loadOwnEntry(id, token, version) {
-  resetForm();
-  $("#form-mode-label").textContent = "ANMELDUNG LADEN …";
-  try {
-    const entry = await rpc("hive_get_registration", { p_id: id, p_token: token });
-    if (version !== state.editLoadVersion) return;
-    if (!entry) throw new Error("Der Bearbeitungslink ist ungültig oder der Eintrag wurde entfernt.");
-    setEditMode(entry, id, token);
-  } catch (error) {
-    if (version !== state.editLoadVersion) return;
-    showError($("#form-error"), error.message);
-    $("#form-mode-label").textContent = "BEARBEITUNG NICHT MÖGLICH";
-  }
-}
-
 function route() {
   const editLoadVersion = ++state.editLoadVersion;
   const hash = location.hash || (/\/anmeldung\/?$/.test(location.pathname) ? "#/anmeldung" : "#/willkommen");
@@ -624,8 +600,8 @@ function route() {
   $(".main-nav").classList.remove("open");
   $(".menu-toggle").setAttribute("aria-expanded", "false");
   if (view !== "signup" && state.mode === "admin-edit") resetForm();
-  if (edit) loadOwnEntry(edit[1], edit[2], editLoadVersion);
-  else if (view === "signup" && state.mode !== "admin-edit") resetForm();
+  if (view === "signup" && state.mode !== "admin-edit") loadParticipantEntry(editLoadVersion);
+  paintParticipant();
   if (view === "public") loadPublicEntries();
   if (view === "admin" && state.auth) loadEntries();
   if (hash === "#brief") requestAnimationFrame(() => $("#brief").scrollIntoView({ behavior: "smooth" }));
@@ -634,14 +610,10 @@ function route() {
 
 form.addEventListener("submit", submitRegistration);
 $("#admin-login-form").addEventListener("submit", login);
-$("#copy-link").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText($("#edit-link").value); showToast("Bearbeitungslink kopiert."); }
-  catch { $("#edit-link").select(); showToast("Link markiert – bitte kopiere ihn mit Strg+C."); }
-});
 $("#delete-button").addEventListener("click", () => {
   state.adminDeleteEntry = null;
   $("#delete-title").textContent = "Wirklich raus aus dem Raid?";
-  $("#delete-description").textContent = "Deine Angaben werden dauerhaft entfernt. Mit diesem Bearbeitungslink kannst du sie danach nicht mehr aufrufen.";
+  $("#delete-description").textContent = "Deine Angaben werden dauerhaft entfernt. Du kannst dich danach mit deinem Discord-Konto erneut anmelden.";
   $("#confirm-delete").textContent = "Ja, Anmeldung löschen";
   showError($("#delete-error"), "");
   $("#delete-dialog").showModal();
@@ -662,8 +634,8 @@ $("#confirm-delete").addEventListener("click", async () => {
       await loadEntries();
       showToast(`Eintrag von ${target.name} gelöscht.`);
     } else {
-      const deleted = await rpc("hive_delete_registration", { p_id: state.editId, p_token: state.editToken });
-      if (!deleted) throw new Error("Der Bearbeitungslink ist ungültig oder der Eintrag wurde bereits gelöscht.");
+      const deleted = await request("/rest/v1/rpc/hive_delete_my_registration", { method: "POST", body: {}, token: await participantToken() });
+      if (!deleted) throw new Error("Der Eintrag wurde bereits gelöscht.");
       $("#delete-dialog").close();
       resetForm();
       location.hash = "#/willkommen";
@@ -693,5 +665,98 @@ $(".menu-toggle").addEventListener("click", () => {
 });
 window.addEventListener("hashchange", route);
 try { state.auth = JSON.parse(sessionStorage.getItem("hive_admin_auth") || "null"); } catch { state.auth = null; }
+// Participant authentication is independent of the existing raid-lead session.
+const discordAuth = configured() ? new AuthClient({
+  url: `${SUPABASE_URL}/auth/v1`, headers: { apikey: SUPABASE_PUBLIC_KEY },
+  storageKey: 'hive_discord_auth', storage: sessionStorage,
+  flowType: 'pkce', autoRefreshToken: true, persistSession: true, detectSessionInUrl: true,
+}) : null;
+let participant = null;
+let participantReady = false;
+
+async function participantToken() {
+  if (!discordAuth) throw new Error('Die Anmeldung ist noch nicht eingerichtet.');
+  const { data, error } = await discordAuth.getSession();
+  if (error) throw error;
+  if (!data.session?.access_token) throw new Error('Bitte melde dich mit Discord an.');
+  return data.session.access_token;
+}
+
+function paintParticipant() {
+  const adminEditing = state.mode === 'admin-edit';
+  $('#discord-login').hidden = Boolean(participant);
+  $('#discord-logout').hidden = !participant;
+  $('#discord-status').textContent = !participantReady ? 'Anmeldung wird geprüft …' : participant ? 'Mit Discord angemeldet. Deine Angaben kannst du hier jederzeit aktualisieren.' : 'Melde dich einmal mit Discord an, um dich einzutragen oder deine Angaben zu ändern.';
+  $('#discord-login').disabled = !participantReady;
+  $('#discord-account').hidden = adminEditing;
+  $('.form-layout').hidden = !adminEditing && !participant;
+}
+
+async function loadParticipantEntry(version) {
+  resetForm();
+  paintParticipant();
+  if (!participantReady || !participant) return;
+  $('#submit-button').disabled = true;
+  let loaded = false;
+  try {
+    const entry = await request('/rest/v1/rpc/hive_get_my_registration', { method: 'POST', body: {}, token: await participantToken() });
+    if (version !== state.editLoadVersion) return;
+    loaded = true;
+    if (entry) { setEditMode(entry, entry.id, null); state.mode = 'own-edit'; }
+    else resetForm();
+  } catch (error) {
+    if (version !== state.editLoadVersion) return;
+    showError($('#form-error'), error.message);
+  } finally {
+    if (version === state.editLoadVersion) { $('#submit-button').disabled = !loaded; paintParticipant(); }
+  }
+}
+
+$('#discord-login').addEventListener('click', async () => {
+  showError($('#discord-error'), '');
+  $('#discord-login').disabled = true;
+  try {
+    if (!discordAuth) throw new Error('Die Anmeldung ist noch nicht eingerichtet.');
+    const redirectTo = new URL('anmeldung/', document.baseURI).href.split('#')[0].split('?')[0];
+    const { error } = await discordAuth.signInWithOAuth({ provider: 'discord', options: { redirectTo } });
+    if (error) throw error;
+  } catch (error) { showError($('#discord-error'), error.message); $('#discord-login').disabled = false; }
+});
+$('#discord-logout').addEventListener('click', async () => {
+  const { error } = await discordAuth.signOut({ scope: 'local' });
+  if (error) { showError($('#discord-error'), 'Abmelden fehlgeschlagen. Bitte versuche es erneut.'); return; }
+  participant = null;
+  resetForm();
+  paintParticipant();
+});
+$('#edit-my-entry').addEventListener('click', () => { loadParticipantEntry(++state.editLoadVersion); });
+
+async function initializeParticipant() {
+  try {
+    if (!discordAuth) return;
+    const initialization = await discordAuth.initialize();
+    if (initialization.error) throw initialization.error;
+    const { data, error } = await discordAuth.getSession();
+    if (error) throw error;
+    participant = data.session?.user || null;
+    discordAuth.onAuthStateChange((event, session) => {
+      participant = session?.user || null;
+      if (event === 'SIGNED_OUT' && state.mode !== 'admin-edit') { resetForm(); paintParticipant(); }
+    });
+  } catch (error) {
+    showError($('#discord-error'), 'Discord-Anmeldung fehlgeschlagen: ' + error.message);
+  } finally {
+    participantReady = true;
+    // OAuth errors can otherwise be mistaken for a welcome-page hash.
+    const url = new URL(location.href);
+    if (url.searchParams.has('code') || url.searchParams.has('error') || url.hash.includes('error=')) {
+      url.searchParams.delete('code'); url.searchParams.delete('error'); url.searchParams.delete('error_code'); url.searchParams.delete('error_description');
+      url.hash = '#/anmeldung'; history.replaceState(null, '', url);
+    }
+    route();
+  }
+}
+
 renderAllPickers();
 route();
+initializeParticipant();

@@ -1,0 +1,15 @@
+{
+  "name": "hive-forever",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-auth.mjs && node scripts/build-pages.mjs",
+    "test": "node --test tests/race-classes.test.mjs"
+  },
+  "dependencies": {
+    "@supabase/auth-js": "2.116.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}

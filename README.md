@@ -1,47 +1,39 @@
-# HIVE Comeback
+# HIVE Forever
 
-Eine statische, responsive HIVE-Seite für GitHub Pages. Einträge werden in Supabase/PostgreSQL gespeichert; GitHub Pages allein kann keine gemeinsam bearbeitbare Datenbank betreiben.
+Live: [hive-guild.github.io/anmeldung/](https://hive-guild.github.io/anmeldung/) · [GitHub](https://github.com/hive-guild/hive-guild.github.io) · [Admin-Login](https://hive-guild.github.io/#/admin)
 
-Live-Seite: [hive-guild.github.io/anmeldung/](https://hive-guild.github.io/anmeldung/) · Repository: [hive-guild/hive-guild.github.io](https://github.com/hive-guild/hive-guild.github.io)
+Die bisherige Adresse [flyleaf1502.github.io/hive/](https://flyleaf1502.github.io/hive/) bleibt aktiv. Beide Seiten verwenden dieselbe Supabase-Datenbank. Das bestehende lokale Repository bleibt die Quelle für beide Veröffentlichungen.
 
-Die bisherige Adresse [flyleaf1502.github.io/hive](https://flyleaf1502.github.io/hive/) bleibt aktiv. Beide Veröffentlichungen verwenden dieselbe Supabase-Datenbank. Änderungen werden mit `git push origin main` und `git push hive-pages main` in beide Repositories veröffentlicht.
+## Anmeldung und Zugriff
 
-## Einrichten
+- Teilnehmer melden sich über Discord an. Pro Konto gibt es genau eine Rückmeldung; nach erneutem Login werden die eigenen Angaben zum Bearbeiten geladen. Es gibt keine persönlichen Bearbeitungslinks mehr.
+- Der Discordname stammt serverseitig aus der verifizierten Discord-Identität. Er wird nicht in einem Formular eingegeben und bleibt ausschließlich in der eigenen Rückmeldung und Admin-Ansicht sichtbar.
+- Öffentlich gibt `hive_public_roster` genau **Name, Race, Class, Spec und Rolle** zurück. Die vollständige Tabelle bleibt durch RLS nur für freigeschaltete Admins zugänglich.
+- Der Admin-Login bleibt separat unter `#/admin`, mit E-Mail/Passwort und Freischaltung über `hive_admins`. Ein normales Discord-Konto erhält keine Admin-Rechte.
+- Teilnehmer lesen, speichern und löschen ausschließlich über die drei `hive_*_my_registration`-RPCs. Diese bestimmen den Eigentümer aus `auth.uid()`, prüfen eine Discord-Identität und ignorieren vom Client mitgesendete Eigentümer oder Discordnamen. Die früheren Token-RPCs sind für `anon` und `authenticated` gesperrt.
+- Supabase speichert die OAuth-E-Mail im Auth-Dienst; die Raid-Tabelle enthält keine E-Mail. Sitzungen liegen im Session Storage des jeweiligen Tabs. OAuth verwendet PKCE; Client-Secret und Service-Role-Key gehören niemals in `dist/` oder Git.
 
-1. Ein kostenloses [Supabase-Projekt](https://supabase.com/dashboard) anlegen. In **SQL Editor** den Inhalt von [`db/supabase.sql`](db/supabase.sql) ausführen. Das Skript ist für ein frisches Projekt gedacht. Wenn die Tabelle bereits besteht, müssen die neuen Spalten zuerst per Migration ergänzt werden.
-2. In **Authentication → Users** einen Admin-Nutzer mit E-Mail und Passwort anlegen. Dessen UUID aus der Nutzerliste kopieren und im SQL Editor ausführen:
+## Einrichtung
 
-   ```sql
-   insert into public.hive_admins (user_id) values ('DEINE-ADMIN-USER-UUID');
-   ```
+1. Für eine neue Datenbank `db/supabase.sql` ausführen. Für das laufende Projekt ausschließlich gezielte Migrationen unter `db/migrations` verwenden; zuletzt `2026-09-14-discord-accounts.sql`.
+2. In Supabase Authentication einen Admin mit E-Mail/Passwort anlegen und seine UUID in `public.hive_admins(user_id)` eintragen.
+3. `dist/config.js` enthält nur die öffentliche Supabase-URL und den Publishable Key.
+4. Discord-App **HIVE FOREVER**, Client-ID `1549126667295785110`: OAuth2-Redirect `https://amsmtoxjkitcwzumwyuz.supabase.co/auth/v1/callback`. Das Client-Secret direkt im Supabase-Discord-Anbieter speichern. [Konfiguration und Prüfungen](docs/discord-login.md).
+5. GitHub Settings → Pages → Source **GitHub Actions**. Mit `git push origin main` und `git push hive-pages main` beide Repositories veröffentlichen. Beide Pages-Workflows müssen erfolgreich sein.
 
-3. In **Project Settings → API** die **Project URL** und einen öffentlichen **publishable key** (alternativ einen älteren **anon JWT**) kopieren und als `SUPABASE_URL` und `SUPABASE_PUBLIC_KEY` in [`dist/config.js`](dist/config.js) eintragen. Niemals einen `secret`-/`service_role`-Schlüssel oder ein Passwort dort ablegen.
-4. Diesen Ordner als eigenes GitHub-Repository mit Branch `main` veröffentlichen. Unter **Settings → Pages → Build and deployment** als Quelle **GitHub Actions** wählen. Der enthaltene Workflow veröffentlicht `dist/` bei jedem Push.
-5. Die veröffentlichte URL aufrufen und eine Testanmeldung machen. Den persönlichen Bearbeitungslink kopieren und eine Änderung speichern. Unter `#/uebersicht` prüfen, dass öffentlich nur Name, Rasse, Klasse, Spec und Rolle erscheinen. Unter `#/admin` mit dem Admin-Konto die vollständige Übersicht prüfen. Den Testeintrag über seinen Bearbeitungslink löschen.
+## Entwicklung und Prüfung
 
-Für das bereits laufende HIVE-Raid-Projekt wird bei Änderungen an den Datenbankregeln nur die passende Datei unter [`db/migrations`](db/migrations) im Supabase SQL Editor ausgeführt. Das vollständige `db/supabase.sql` ist für ein neues Projekt gedacht.
+Die statischen Dateien liegen in `dist/`. Lokal mit einem HTTP-Server aus diesem Verzeichnis starten. Nach HTML-Änderungen `node scripts/build-pages.mjs` ausführen; das erzeugt die direkte Anmeldeseite `/anmeldung/`. Der Workflow erledigt dies ebenfalls vor der Veröffentlichung.
 
-## Was geschützt ist
+Die offizielle Supabase-Auth-Bibliothek ist lokal gebündelt und fest versioniert. Für Änderungen am Bundle: Abhängigkeiten mit pnpm installieren und `node scripts/build-auth.mjs` ausführen. `dist/vendor/` enthält das fertige Bundle samt Lizenz; Besucher brauchen kein externes JavaScript-CDN.
 
-- Teilnehmer bekommen nach dem Absenden einen zufälligen geheimen Bearbeitungslink, den sie selbst kopieren müssen. Er wird nicht dauerhaft im Browser gespeichert; in der Datenbank liegt nur sein SHA-256-Hash. Über den Link können sie ihre Angaben aktualisieren oder den Eintrag dauerhaft löschen. Ohne Link ist die Selbstbearbeitung nicht möglich; der Admin kann den Eintrag weiterhin bearbeiten.
-- Unter `#/uebersicht` sind **Name, Rasse, Klasse, Spec und Rolle** aller Anmeldungen öffentlich sichtbar. Die dafür eingerichtete SQL-Funktion gibt genau diese fünf Felder zurück.
-- Die vollständige Tabelle ist nicht öffentlich lesbar. Die Admin-Seite unter `#/admin` zeigt zusätzlich alle Antworten, Raidtage, Uhrzeiten und Discordnamen; sie sowie das Bearbeiten und Löschen von Einträgen erfordern einen angemeldeten, in `hive_admins` freigeschalteten Nutzer. Die SQL-Funktionen prüfen den persönlichen Bearbeitungslink serverseitig.
-- Der öffentliche publishable key bzw. ältere anon JWT ist bewusst für den Browser bestimmt. Zugriffsschutz erfolgt durch Datenbankrechte und Row Level Security. Ein privater `secret`-/`service_role`-Schlüssel darf nie in GitHub oder im Browser liegen.
-- Neue Anmeldungen sind serverseitig pro Verbindung und insgesamt begrenzt. Dafür speichert die Datenbank einen mit einem privaten Schlüssel erzeugten IP-Hash höchstens einen Tag; die rohe IP wird nicht in der HIVE-Tabelle abgelegt. Das Limit schützt vor einem Überfluten der öffentlichen Liste, ersetzt aber keinen Schutz am API-Gateway gegen massenhaft ungültige Anfragen.
+Prüfungen: `node --check dist/app.js`, `node --check dist/config.js`, `node --test tests/race-classes.test.mjs`. `tests/discord-accounts.sql` prüft Speichern, Aktualisieren, Löschen, Kontentrennung, RLS und Admin-Rechte in einer Transaktion, die alle Testdaten zurückrollt. Den tatsächlichen Discord-Rücksprung zusätzlich im Browser prüfen.
 
-## Raidzeiten
+## Race, Class und Raidzeiten
 
-Teilnehmer wählen maximal vier Raidtage pro Woche. Außerdem geben sie an, ab wann sie frühestens können (`18:30`, `19:00`, `19:30` oder `20:00 Uhr`) und bis wann sie maximal können (`22:00`, `22:30` oder `23:00 Uhr`). Beide Zeitangaben sind Pflichtfelder und lassen sich über den persönlichen Bearbeitungslink aktualisieren. „Kennen wir uns?“ ist optional.
+[Gültige Horde-Kombinationen und Quellen](docs/race-class-combinations.md). Unpassende Race-/Class-Kacheln bleiben sichtbar, sind ausgegraut und deaktiviert. „Auswahl zurücksetzen“ löscht nur Race, Class und Spec. Server und Formular verwenden dieselbe Matrix.
 
-## Race und Class
-
-Die Class-Auswahl richtet sich nach den angekündigten Horde-Kombinationen für WoW Forever. [Matrix, Quellen und Verhalten beim Race-Wechsel](docs/race-class-combinations.md) sind dokumentiert. Für das laufende Projekt ergänzt `db/migrations/2026-09-14-forever-race-class-combinations.sql` die serverseitige Prüfung ohne historische Daten zu verändern.
-
-## Lokal ansehen
-
-`dist/index.html` benötigt einen kleinen HTTP-Server, weil es JavaScript-Module lädt. Beispielsweise im Repository-Verzeichnis: `npx serve dist`. Ohne Supabase-Konfiguration ist die Gestaltung sichtbar, Speichern und Admin-Login zeigen einen verständlichen Einrichtungsfehler.
-
-Die Seite hat keine Laufzeit-Abhängigkeiten. Die HTML-, CSS- und JavaScript-Dateien in `dist/` können direkt bearbeitet werden. Nach HTML-Änderungen erzeugt `node scripts/build-pages.mjs` die direkte Anmeldeseite unter `/anmeldung/` aus `dist/index.html`. Der Pages-Workflow führt diesen Schritt und die Race-/Class-Prüfungen automatisch aus. Die bisherigen Hash- und Bearbeitungslinks funktionieren weiterhin.
+Maximal vier Raidtage pro Woche, Startzeiten `18:30`, `19:00`, `19:30`, `20:00`, Endzeiten `22:00`, `22:30`, `23:00`. „Kennen wir uns?“ bleibt optional. Neue Werte mit `18:00` werden serverseitig abgewiesen.
 
 ## Icons
 
